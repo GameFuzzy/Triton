@@ -1,0 +1,10 @@
+Package: com.zen.androidp
+Name: AndroidP
+Depends: mobilesubstrate
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: Zen
+Author: Zen
+Section: Tweaks
+Version: 0.0.1-119+debug
+Installed-Size: 464
