@@ -56,6 +56,7 @@ AVBackdropView *backdrop = nil;
 AVBackdropView *backdropMute = nil;
 AVVolumeButtonControl *button = nil;
 UIView *placeholder = nil;
+UIView *placeholder2 = nil;
 UIImageView *image;
 UIImageView *imgViewMute;
 SBHUDWindow *HUDWindow;
@@ -69,6 +70,11 @@ SBHUDWindow *HUDWindow;
 %end
 
 %hook SBHUDController
+
+-(void)_orderWindowOut:(id)arg1{
+  // If an animation is wanted: [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdrop.alpha = 0;} completion:nil];
+  %orig;
+}
 
 -(void)presentHUDView:(UIView*)HUDView autoDismissWithDelay:(CGFloat)arg2{
     %orig;
@@ -84,15 +90,16 @@ SBHUDWindow *HUDWindow;
     HUDView.hidden = true;
     CGRect bounds;
     CGRect bounds1;
-    bounds.size.width = 47;
-    bounds.size.height = 200;
-    bounds.origin.x = 500;
-    bounds.origin.y = 0;
+    bounds.size.width = 162;
+    bounds.size.height = 47;
+    bounds.origin.x = ([[UIScreen mainScreen] bounds].size.width) - 60;;
+    bounds.origin.y = 200;
     bounds1.size.height = 47;
     bounds1.size.width = 47;
     bounds1.origin.y = 285;
-    bounds1.origin.x += 315;
-    bounds1.origin.y += 130;
+    bounds1.origin.x = bounds.origin.x;
+    bounds1.origin.y += (bounds.origin.y) + 215;
+
     if(newHUD == nil) {
     newHUD = [[AVVolumeSlider alloc] initWithFrame:bounds];
     [newHUD setMaximumValueImage:[UIImage imageWithContentsOfFile:imgPath]];
@@ -101,36 +108,34 @@ SBHUDWindow *HUDWindow;
     CGAffineTransform translate = CGAffineTransformMakeTranslation(0,17.5);
     newHUD.transform = CGAffineTransformConcat(translate, rotate);
     imgViewMute = [[UIImageView alloc] initWithFrame:bounds1];
-    //CGAffineTransform translate1 = CGAffineTransformMakeTranslation(315, 430);
-    //CGAffineTransform resize = CGAffineTransformMakeScale(30,30);
     imgViewMute.transform = CGAffineTransformMakeScale(0.5,0.5);
-    //imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathMute];
-    bounds.size.width = 47;
-    bounds.origin.x = 315;
-    bounds.origin.y = 200;
+    //bounds.size.width = 47;
+    //bounds.origin.x = 315;
+    //bounds.origin.y = 200;
     backdrop = [[AVBackdropView alloc] initWithFrame:bounds];
     backdropMute = [[AVBackdropView alloc] initWithFrame:bounds1];
-    bounds.size.width = 35;
-    bounds.origin.y = 0;
-placeholder = [[UIView alloc] initWithFrame:bounds];
-[placeholder.widthAnchor constraintEqualToConstant:35].active = true;
+    backdrop.tintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:1];
+    backdropMute.tintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:1];
+    placeholder2 = [[UIView alloc] initWithFrame:bounds];
+    [placeholder.widthAnchor constraintEqualToConstant:42].active = true;
+    [placeholder2.widthAnchor constraintEqualToConstant:20].active = true;
 
     }
 
-    bounds.origin.x = 40;
-    bounds.origin.y = 0;
-    bounds.size.width = 100;
-    bounds.size.height = 47;
-
+    //bounds.origin.x = 40;
+    //bounds.origin.y = 0;
+    //bounds.size.width = 100;
+    //bounds.size.height = 47;
         [HUDWindow addSubview:backdrop];
         [HUDWindow addSubview:backdropMute];
         [newHUD.widthAnchor constraintEqualToConstant:100].active = true;
         [backdrop.contentView addArrangedSubview:newHUD];
         [backdrop.contentView addArrangedSubview:placeholder];
+        [backdrop.contentView addArrangedSubview:placeholder2];
         [backdropMute.contentView addArrangedSubview:imgViewMute];
         [newHUD setBounds:bounds];
 
-  %orig;
+  // If an animation is wanted: [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdrop.alpha = 1;} completion:nil];
 }
 
 %end
