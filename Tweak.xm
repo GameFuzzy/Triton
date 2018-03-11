@@ -56,7 +56,6 @@ AVBackdropView *backdrop = nil;
 AVBackdropView *backdropMute = nil;
 AVVolumeButtonControl *button = nil;
 UIView *placeholder = nil;
-UIView *placeholder2 = nil;
 UIImageView *image;
 UIImageView *imgViewMute;
 SBHUDWindow *HUDWindow;
@@ -90,13 +89,12 @@ SBHUDWindow *HUDWindow;
     HUDView.hidden = true;
     CGRect bounds;
     CGRect bounds1;
-    bounds.size.width = 162;
-    bounds.size.height = 47;
+    bounds.size.width = 47;
+    bounds.size.height = 200;
     bounds.origin.x = ([[UIScreen mainScreen] bounds].size.width) - 60;;
     bounds.origin.y = 200;
     bounds1.size.height = 47;
     bounds1.size.width = 47;
-    bounds1.origin.y = 285;
     bounds1.origin.x = bounds.origin.x;
     bounds1.origin.y += (bounds.origin.y) + 215;
 
@@ -109,29 +107,26 @@ SBHUDWindow *HUDWindow;
     newHUD.transform = CGAffineTransformConcat(translate, rotate);
     imgViewMute = [[UIImageView alloc] initWithFrame:bounds1];
     imgViewMute.transform = CGAffineTransformMakeScale(0.5,0.5);
-    //bounds.size.width = 47;
-    //bounds.origin.x = 315;
-    //bounds.origin.y = 200;
+    bounds.origin.y = 200;
     backdrop = [[AVBackdropView alloc] initWithFrame:bounds];
     backdropMute = [[AVBackdropView alloc] initWithFrame:bounds1];
-    backdrop.tintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:1];
-    backdropMute.tintColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:1];
-    placeholder2 = [[UIView alloc] initWithFrame:bounds];
-    [placeholder.widthAnchor constraintEqualToConstant:42].active = true;
-    [placeholder2.widthAnchor constraintEqualToConstant:20].active = true;
-
+    bounds.size.width = 35;
+    bounds.origin.y = 0;
+    backdrop.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
+    backdropMute.backgroundColor = [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7];
+    placeholder = [[UIView alloc] initWithFrame:bounds];
+    [placeholder.widthAnchor constraintEqualToConstant:35].active = true;
     }
 
-    //bounds.origin.x = 40;
-    //bounds.origin.y = 0;
-    //bounds.size.width = 100;
-    //bounds.size.height = 47;
+    bounds.origin.x = 40;
+    bounds.size.width = 100;
+    bounds.size.height = 47;
+
         [HUDWindow addSubview:backdrop];
         [HUDWindow addSubview:backdropMute];
         [newHUD.widthAnchor constraintEqualToConstant:100].active = true;
         [backdrop.contentView addArrangedSubview:newHUD];
         [backdrop.contentView addArrangedSubview:placeholder];
-        [backdrop.contentView addArrangedSubview:placeholder2];
         [backdropMute.contentView addArrangedSubview:imgViewMute];
         [newHUD setBounds:bounds];
 
