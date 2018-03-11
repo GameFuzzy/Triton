@@ -1,5 +1,4 @@
 //TO DO:
-//Haven't got the muted/not muted checking to show up correctly yet.
 //Remove the bug that makes the volume slider appear as just a circle everytime it's opened.
 //Give the bounds different origins depending on scren size. Example project: https://github.com/runnersaw/MinimalHUD/blob/master/Tweak.xm
 
@@ -47,8 +46,9 @@
 @interface SBHUDView
 @end
 
-@interface MNRingerSwitchObserver : NSObject
-+(id)sharedObserver;
+@interface SBMediaController : NSObject
++(id)sharedInstance;
+-(BOOL)isRingerMuted;
 @end
 
 AVVolumeSlider *newHUD = nil;
@@ -71,8 +71,16 @@ SBHUDWindow *HUDWindow;
 %hook SBHUDController
 
 -(void)presentHUDView:(UIView*)HUDView autoDismissWithDelay:(CGFloat)arg2{
-  //try{
     %orig;
+
+    BOOL ringerMuted = [[%c(SBMediaController) sharedInstance] isRingerMuted];
+    if(ringerMuted){
+      imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathMute];
+    }
+    else{
+      imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathNotMute];
+    }
+
     HUDView.hidden = true;
     CGRect bounds;
     CGRect bounds1;
@@ -127,6 +135,21 @@ placeholder = [[UIView alloc] initWithFrame:bounds];
 
 %end
 
+/*
+%hook PTVolumeChangeNotifier
+-(void)ringerSilentChanged{
+  %orig;
+  BOOL ringerMuted = [[%c(SBMediaController) sharedInstance] isRingerMuted];
+  if(ringerMuted){
+    imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathMute];
+  }
+  else{
+    imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathNotMute];
+  }
+}
+%end
+*/
+
 %hook SBVolumeHUDView
   -(id)setProgress:(float)volume{
     [newHUD setValue:volume animated:true];
@@ -142,20 +165,6 @@ placeholder = [[UIView alloc] initWithFrame:bounds];
   newbounds.size.width = 25;
   newbounds.size.height = 25;
   return newbounds;
-}
-
-%end
-
-%hook PTVolumeChangeNotifier
-BOOL silentEnabled = MSHookIvar<BOOL *>([%c(MNRingerSwitchObserver) sharedObserver], "_ringerSwitchEnabled");
--(void)ringerSilentChanged{
-  %orig;
-  if(silentEnabled){
-    imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathMute];
-  }
-  else{
-    imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathNotMute];
-  }
 }
 
 %end
