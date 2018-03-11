@@ -1,6 +1,6 @@
 //TO DO:
 //Remove the bug that makes the volume slider appear as just a circle everytime it's opened.
-//Give the bounds different origins depending on scren size. Example project: https://github.com/runnersaw/MinimalHUD/blob/master/Tweak.xm
+//Create the preferences.
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
@@ -107,7 +107,6 @@ SBHUDWindow *HUDWindow;
     newHUD.transform = CGAffineTransformConcat(translate, rotate);
     imgViewMute = [[UIImageView alloc] initWithFrame:bounds1];
     imgViewMute.transform = CGAffineTransformMakeScale(0.5,0.5);
-    bounds.origin.y = 200;
     backdrop = [[AVBackdropView alloc] initWithFrame:bounds];
     backdropMute = [[AVBackdropView alloc] initWithFrame:bounds1];
     bounds.size.width = 35;
