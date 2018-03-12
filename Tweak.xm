@@ -1,6 +1,7 @@
 //TO DO:
 //Remove the bug that makes the volume slider appear as just a circle everytime it's opened.
 //Create the preferences.
+//Make the user able to pull the slider up and down using finger?
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
@@ -71,7 +72,7 @@ SBHUDWindow *HUDWindow;
 %hook SBHUDController
 
 -(void)_orderWindowOut:(id)arg1{
-  // If an animation is wanted: [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdrop.alpha = 0;} completion:nil];
+  [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdrop.alpha = 0;} completion:nil];
   %orig;
 }
 
@@ -129,7 +130,7 @@ SBHUDWindow *HUDWindow;
         [backdropMute.contentView addArrangedSubview:imgViewMute];
         [newHUD setBounds:bounds];
 
-  // If an animation is wanted: [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdrop.alpha = 1;} completion:nil];
+  [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdrop.alpha = 1;} completion:nil];
 }
 
 %end
