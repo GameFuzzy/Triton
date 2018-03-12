@@ -1,9 +1,9 @@
 export ARCHS = armv7 armv7s arm64
 include $(THEOS)/makefiles/common.mk
 
-TWEAK_NAME = AndroidP
-AndroidP_FILES = Tweak.xm
-AndroidP_FRAMEWORKS = AVKit
+TWEAK_NAME = Triton
+Triton_FILES = Tweak.xm
+Triton_FRAMEWORKS = AVKit
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
