@@ -135,21 +135,6 @@ SBHUDWindow *HUDWindow;
 
 %end
 
-/*
-%hook PTVolumeChangeNotifier
--(void)ringerSilentChanged{
-  %orig;
-  BOOL ringerMuted = [[%c(SBMediaController) sharedInstance] isRingerMuted];
-  if(ringerMuted){
-    imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathMute];
-  }
-  else{
-    imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathNotMute];
-  }
-}
-%end
-*/
-
 %hook SBVolumeHUDView
   -(id)setProgress:(float)volume{
     [newHUD setValue:volume animated:true];
