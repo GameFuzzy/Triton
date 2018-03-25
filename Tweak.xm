@@ -1,15 +1,28 @@
 //TO DO:
-//Remove the bug that makes the volume slider appear as just a circle everytime it's opened.
-//Create the preferences.
-//Make the user able to pull the slider up and down using finger?
+//1. Make newHUD actually show.
+//2. Make muteButton work instead of crashing the springboard.
+//3. Remove the bug that makes the volume slider appear as just a circle everytime it's opened.
 
+static BOOL Enabled = YES;
+static BOOL darkModeEnabled = NO;
+CFStringRef tritonPrefsKey = CFSTR("com.zen.tritonprefs");
+static CFStringRef settingsChangedNotification = CFSTR("com.zen.tritonprefs/settingschanged");
+static CFStringRef darkModeKey = CFSTR("darkMode");
+static CFStringRef EnabledKey = CFSTR("Enabled");
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <SpringBoard/SpringBoard.h>
 #import <AVKit/AVKit.h>
+#import <MediaPlayer/MPVolumeView.h>
+#import "Tweak.h"
+
 #define imgPath @"/Library/PreferenceBundles/TritonPrefs.bundle/volume.png"
 #define imgPathMute @"/Library/PreferenceBundles/TritonPrefs.bundle/mute.png"
 #define imgPathNotMute @"/Library/PreferenceBundles/TritonPrefs.bundle/notmute.png"
+
+#define imgPathDark @"/Library/PreferenceBundles/TritonPrefs.bundle/volumeDark.png"
+#define imgPathMuteDark @"/Library/PreferenceBundles/TritonPrefs.bundle/muteDark.png"
+#define imgPathNotMuteDark @"/Library/PreferenceBundles/TritonPrefs.bundle/notmuteDark.png"
 
 @interface AVVolumeSlider : UISlider
 @property (nonatomic) bool collapsed;
@@ -25,6 +38,10 @@
 -(id)initWithFrame:(CGRect)arg1;
 -(void)_setCornerRadius:(CGFloat)arg1;
 +(id)alloc;
+@end
+
+@interface MPVolumeSlider : UISlider
+-(void)setUserInteractionEnabled:(BOOL)arg1;
 @end
 
 @interface AVStackView : UIStackView
@@ -50,16 +67,28 @@
 @interface SBMediaController : NSObject
 +(id)sharedInstance;
 -(BOOL)isRingerMuted;
+-(void)setRingerMuted:(BOOL)arg1;
 @end
 
-AVVolumeSlider *newHUD = nil;
+MPVolumeSlider *newHUD = nil;
 AVBackdropView *backdrop = nil;
 AVBackdropView *backdropMute = nil;
-AVVolumeButtonControl *button = nil;
 UIView *placeholder = nil;
 UIImageView *image;
 UIImageView *imgViewMute;
+UIImageView *imgViewVolume;
 SBHUDWindow *HUDWindow;
+BOOL ringerMuted;
+UIButton *muteButton;
+BOOL ringerShouldBeMuted;
+
+@implementation Triton
+- (void)setMuted1:(BOOL)shouldBe{[[%c(SBMediaController) sharedInstance] setRingerMuted:shouldBe];
+}
+- (void)setMuted{[self setMuted1:ringerShouldBeMuted];}
+
+- (void)Test{}
+@end
 
 %hook SBHUDWindow
 
@@ -70,42 +99,81 @@ SBHUDWindow *HUDWindow;
 %end
 
 %hook SBHUDController
-
 -(void)_orderWindowOut:(id)arg1{
+  if(Enabled)
+  {
+    [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdropMute.alpha = 0;} completion:nil];
+
   [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdrop.alpha = 0;} completion:nil];
+}
   %orig;
 }
-
 -(void)presentHUDView:(UIView*)HUDView autoDismissWithDelay:(CGFloat)arg2{
     %orig;
-
-    BOOL ringerMuted = [[%c(SBMediaController) sharedInstance] isRingerMuted];
-    if(ringerMuted){
+    if(Enabled)
+{
+    ringerMuted = [[%c(SBMediaController) sharedInstance] isRingerMuted];
+    if(ringerMuted && darkModeEnabled){
       imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathMute];
     }
-    else{
+    else if (ringerMuted == NO && darkModeEnabled){
       imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathNotMute];
     }
+    else if(ringerMuted && darkModeEnabled == NO)
+    {
+        imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathMuteDark];
+    }
+    else
+    {
+        imgViewMute.image = [UIImage imageWithContentsOfFile:imgPathNotMuteDark];
+    }
+    if(darkModeEnabled){
+          //[newHUD setMaximumValueImage:[UIImage imageWithContentsOfFile:imgPath]];
+          imgViewVolume.image = [UIImage imageWithContentsOfFile:imgPath];
+    }
+    else{
+    //[newHUD setMaximumValueImage:[UIImage imageWithContentsOfFile:imgPathDark]];
+              imgViewVolume.image = [UIImage imageWithContentsOfFile:imgPathDark];
+}
 
-    HUDView.hidden = true;
+    if(ringerMuted){
+      ringerShouldBeMuted = NO;
+    }
+    else{
+      ringerShouldBeMuted = YES;
+    }
+
+    HUDView.hidden = YES;
     CGRect bounds;
     CGRect bounds1;
     bounds.size.width = 47;
     bounds.size.height = 200;
-    bounds.origin.x = ([[UIScreen mainScreen] bounds].size.width) - 60;;
+    bounds.origin.x = ([[UIScreen mainScreen] bounds].size.width) - 60;
     bounds.origin.y = 200;
     bounds1.size.height = 47;
     bounds1.size.width = 47;
     bounds1.origin.x = bounds.origin.x;
     bounds1.origin.y += (bounds.origin.y) + 215;
-
     if(newHUD == nil) {
-    newHUD = [[AVVolumeSlider alloc] initWithFrame:bounds];
-    [newHUD setMaximumValueImage:[UIImage imageWithContentsOfFile:imgPath]];
+      /*muteButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+      [muteButton setBackgroundColor:[UIColor redColor]];
+      [muteButton addTarget:self
+                 action:@selector(setMuted:)
+       forControlEvents:UIControlEventTouchUpInside];
+      muteButton.frame = bounds1;
+*/
+    newHUD = [[MPVolumeSlider alloc] initWithFrame:bounds];
+      [newHUD setBackgroundColor:[UIColor clearColor]];
+      [newHUD setUserInteractionEnabled:YES];
+      [newHUD setAlpha:1];
     double rads = 3 * M_PI / 2;
     CGAffineTransform rotate = CGAffineTransformMakeRotation(rads);
     CGAffineTransform translate = CGAffineTransformMakeTranslation(0,17.5);
     newHUD.transform = CGAffineTransformConcat(translate, rotate);
+    imgViewVolume = [[UIImageView alloc] initWithFrame:bounds1];
+    CGAffineTransform scale1 = CGAffineTransformMakeScale(0.5,0.5);
+    CGAffineTransform translate1 = CGAffineTransformMakeTranslation(0,0);
+    imgViewVolume.transform = CGAffineTransformConcat(scale1, translate1);
     imgViewMute = [[UIImageView alloc] initWithFrame:bounds1];
     imgViewMute.transform = CGAffineTransformMakeScale(0.5,0.5);
     backdrop = [[AVBackdropView alloc] initWithFrame:bounds];
@@ -126,11 +194,15 @@ SBHUDWindow *HUDWindow;
         [HUDWindow addSubview:backdropMute];
         [newHUD.widthAnchor constraintEqualToConstant:100].active = true;
         [backdrop.contentView addArrangedSubview:newHUD];
+        [backdrop.contentView addArrangedSubview:imgViewVolume];
         [backdrop.contentView addArrangedSubview:placeholder];
         [backdropMute.contentView addArrangedSubview:imgViewMute];
+        //[backdropMute.contentView addArrangedSubview:muteButton];
         [newHUD setBounds:bounds];
 
   [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdrop.alpha = 1;} completion:nil];
+  [UIView animateWithDuration:0.15 delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{backdropMute.alpha = 1;} completion:nil];
+}
 }
 
 %end
@@ -142,7 +214,7 @@ SBHUDWindow *HUDWindow;
   }
 %end
 
-%hook AVVolumeSlider
+/*%hook AVVolumeSlider
 -(CGRect)maximumValueImageRectForBounds:(CGRect)bounds{
   CGRect newbounds = %orig;
   newbounds.origin.y += 500.5;
@@ -152,4 +224,16 @@ SBHUDWindow *HUDWindow;
   return newbounds;
 }
 
+
 %end
+*/
+static void loadPrefs() {
+  if (CFBridgingRelease(CFPreferencesCopyAppValue(darkModeKey, tritonPrefsKey))) {
+             darkModeEnabled = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(darkModeKey, tritonPrefsKey)) boolValue];     }
+             if (CFBridgingRelease(CFPreferencesCopyAppValue(EnabledKey, tritonPrefsKey))) {
+               Enabled = [(id)CFBridgingRelease(CFPreferencesCopyAppValue(EnabledKey, tritonPrefsKey)) boolValue];   }
+}
+%ctor {
+  CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)loadPrefs, settingsChangedNotification, NULL, CFNotificationSuspensionBehaviorCoalesce);
+  loadPrefs();
+    }

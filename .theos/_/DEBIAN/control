@@ -1,11 +1,11 @@
 Package: com.zen.triton
 Name: Triton
 Depends: mobilesubstrate
-Version: 1.0
 Architecture: iphoneos-arm
 Description: Triton Beta
 Depiction: http://gamefuzzy.github.io/depictions/?p=com.zen.triton
 Maintainer: GameFuzzy <Gamefuzzy12345@gmail.com>
 Author: Zen <GameFuzzy12345@gmail.com>
 Section: Tweaks
-
+Version: 1.0-27+debug
+Installed-Size: 528
