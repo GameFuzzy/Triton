@@ -163,7 +163,7 @@ BOOL ringerShouldBeMuted;
       muteButton.frame = bounds1;
 */
     newHUD = [[MPVolumeSlider alloc] initWithFrame:bounds];
-      [newHUD setBackgroundColor:[UIColor clearColor]];
+      //[newHUD setBackgroundColor:[UIColor clearColor]];
       [newHUD setUserInteractionEnabled:YES];
       [newHUD setAlpha:1];
     double rads = 3 * M_PI / 2;
