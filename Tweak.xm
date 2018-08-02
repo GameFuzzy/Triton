@@ -155,13 +155,13 @@ BOOL ringerShouldBeMuted;
     bounds1.origin.x = bounds.origin.x;
     bounds1.origin.y += (bounds.origin.y) + 215;
     if(newHUD == nil) {
-      /*muteButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+      muteButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
       [muteButton setBackgroundColor:[UIColor redColor]];
       [muteButton addTarget:self
                  action:@selector(setMuted:)
        forControlEvents:UIControlEventTouchUpInside];
       muteButton.frame = bounds1;
-*/
+
     newHUD = [[MPVolumeSlider alloc] initWithFrame:bounds];
       //[newHUD setBackgroundColor:[UIColor clearColor]];
       [newHUD setUserInteractionEnabled:YES];
