@@ -85,7 +85,7 @@ BOOL ringerShouldBeMuted;
 @implementation Triton
 - (void)setMuted1:(BOOL)shouldBe{[[%c(SBMediaController) sharedInstance] setRingerMuted:shouldBe];
 }
-- (void)setMuted{[self setMuted1:ringerShouldBeMuted];}
+- (void)setMuted:(id)sender{[self setMuted1:ringerShouldBeMuted];}
 
 - (void)Test{}
 @end
